@@ -1,0 +1,16 @@
+
+# PIR Sensor
+https://www.instructables.com/id/How-to-build-a-People-Counter-with-Raspberry-Pi-an/
+
+
+
+
+# OpenCV
+https://www.pyimagesearch.com/2015/06/01/home-surveillance-and-motion-detection-with-the-raspberry-pi-python-and-opencv/
+https://www.pyimagesearch.com/2018/08/13/opencv-people-counter/
+
+https://www.pyimagesearch.com/2017/10/16/raspberry-pi-deep-learning-object-detection-with-opencv/
+
+
+python3 people_counter.py --prototxt mobilenet_ssd/MobileNetSSD_deploy.prototxt --model mobilenet_ssd/MobileNetSSD_deploy.caffemodel --output output/webcam_output.avi
+
