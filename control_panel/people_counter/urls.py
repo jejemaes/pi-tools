@@ -1,6 +1,17 @@
 from django.urls import path
-from . import views
+from rest_framework.routers import SimpleRouter
 
+from . import views
+from . views import CounterItemsModelViewSet
+
+
+# Page routes
 urlpatterns = [
-    path('', views.home),
+    path('', views.page_counter),
 ]
+
+# API routes
+router = SimpleRouter()
+router.register(r'api/counter', CounterItemsModelViewSet, basename='counteritems')
+
+urlpatterns += router.urls
