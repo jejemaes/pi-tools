@@ -8,7 +8,7 @@ This django app will containt all the data sent from the raspberry pi services, 
 To start this server, run the following command
 
 ```
-pyhton3 manager.py runserver
+python3 manage.py runserver
 ```
 
 ## People Counter
@@ -19,4 +19,8 @@ To simulate the sent data, the following curl can be used
 
 ```
 curl --header "Content-Type: application/json" --request POST  --data '{"count":-2}' http://localhost:8000/api/counter/
+```
+
+```
+python people_counter.py --prototxt config/MobileNetSSD_deploy.prototxt --model config/MobileNetSSD_deploy.caffemodel --server-config config/server_config.json
 ```

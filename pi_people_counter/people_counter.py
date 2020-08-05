@@ -1,12 +1,12 @@
 # USAGE
 # To read and write back out to video:
-# python people_counter.py --prototxt mobilenet_ssd/MobileNetSSD_deploy.prototxt \
-#   --model mobilenet_ssd/MobileNetSSD_deploy.caffemodel --input videos/example_01.mp4 \
+# python people_counter.py --prototxt config/MobileNetSSD_deploy.prototxt \
+#   --model config/MobileNetSSD_deploy.caffemodel --input videos/example_01.mp4 \
 #   --output output/output_01.avi
 #
 # To read from webcam and write back out to disk:
-# python people_counter.py --prototxt mobilenet_ssd/MobileNetSSD_deploy.prototxt \
-#   --model mobilenet_ssd/MobileNetSSD_deploy.caffemodel \
+# python people_counter.py --prototxt config/MobileNetSSD_deploy.prototxt \
+#   --model config/MobileNetSSD_deploy.caffemodel \
 #   --output output/webcam_output.avi
 
 # import the necessary packages
@@ -20,6 +20,8 @@ import imutils
 import time
 import dlib
 import cv2
+import json
+import requests
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -35,14 +37,36 @@ ap.add_argument("-c", "--confidence", type=float, default=0.4,
     help="minimum probability to filter weak detections")
 ap.add_argument("-s", "--skip-frames", type=int, default=30,
     help="# of skip frames between detections")
+ap.add_argument("-sc", "--server-config", type=str,
+    help="relative Path to server config file (ini file)")
 args = vars(ap.parse_args())
 
 # initialize the list of class labels MobileNet SSD was trained to
 # detect
-CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
+CLASSES = [
+    "background", "aeroplane", "bicycle", "bird", "boat",
     "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
     "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-    "sofa", "train", "tvmonitor"]
+    "sofa", "train", "tvmonitor"
+]
+
+# load server config file
+server_config = None
+if args.get('server_config'):
+    print("[INFO] loading control panel config file ...")
+    file = open(args['server_config'])
+    server_config = json.load(file)
+    file.close()
+
+def send_to_server(value):
+    if server_config:
+        try:
+            headers = {'Content-Type': 'application/json'}
+            data = {'count': value}
+            response = requests.post(server_config['url'], json=data, headers=headers)
+
+        except Exception as err:
+            print("[ERROR] %s" % (str(err),))
 
 # load our serialized model from disk
 print("[INFO] loading model...")
@@ -224,7 +248,7 @@ while True:
                 if direction < 0 and centroid[1] < H // 2:
                     totalUp += 1
                     to.counted = True
-                    print("UP")
+                    send_to_server(1)
 
                 # if the direction is positive (indicating the object
                 # is moving down) AND the centroid is below the
@@ -232,7 +256,7 @@ while True:
                 elif direction > 0 and centroid[1] > H // 2:
                     totalDown += 1
                     to.counted = True
-                    print("DOWN")
+                    send_to_server(-1)
 
 
         # store the trackable object in our dictionary
